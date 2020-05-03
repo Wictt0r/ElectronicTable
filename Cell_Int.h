@@ -1,9 +1,10 @@
 #pragma once
 #include "Cell.h"
-class Cell_String :public Cell
+class Cell_Int : public Cell
 {
 public:
 	float sum();
 private:
-	char* string;
+	int number_i;
 };
+

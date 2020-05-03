@@ -51,7 +51,7 @@ void Table::split_input(char*input, size_t lenght)
 				delete[] token;
 				for (size_t i = 0; i <= split_input_counter; ++i)
 					delete[] split_input[i];
-				delete split_input;
+				delete []split_input;
 				return;
 			}
 			strcpy(split_input[split_input_counter], token);
@@ -78,6 +78,7 @@ void Table::detect_function(char** split_input, size_t lenght)
 		else
 		{
 			std::cout << "Error table did not load\n";
+			return;
 		}
 	}
 	if (strcmp(split_input[0], "close") == 0)
@@ -87,6 +88,7 @@ void Table::detect_function(char** split_input, size_t lenght)
 	if (strcmp(split_input[0], "print") == 0)
 	{
 		print();
+		return;
 	}
 	if (strcmp(split_input[0], "edit") == 0)
 	{
@@ -116,22 +118,23 @@ bool Table::open(char* _file)
 	strcpy(file_name, _file);
 	std::ifstream file;
 	file.open(_file);
-	size_t height = 0,width_counter=0;
-	width = 0;
+	size_t width_counter=1;
+	height = 0;
+	width = 1;
 	file.seekg(0);
 	while (file.good())
-	{ 
+	{
 		char character;
 		file.get(character);
 		if (character == ',')
 			width_counter++;
-		if (width < width_counter && character == '\n')
+		if (character == '\n' || file.eof()==true)
 		{
-			width = width_counter;
-			width_counter;
-		}
-		if (character == '\n')
 			height++;
+			if (width < width_counter)
+				width = width_counter;
+			width_counter = 1;
+		}
 	}
 	matrix = new(std::nothrow)  Cell*[height];
 	if (matrix == nullptr)
@@ -152,11 +155,57 @@ bool Table::open(char* _file)
 		}
 	}
 	size_t current_width = 0, current_height = 0;
-	file.seekg(0);
+	file.close();
+	file.open(_file);
 	while (file.good())
 	{
-		
+		char word[100];
+		file>>word;
+		/*while (symbol == ' ')
+		{
+			file.get(symbol);
+		}*/
+		if (strcmp(word, "\n") == 0)
+		{
+			current_height++;
+			current_width = 0;
+			continue;
+		}
+		if (strcmp(word ,",")==0)
+			continue;
+		/*size_t counter = 2;
+		char* word=new (std::nothrow)char[counter];
+		if (word == nullptr)
+		{
+			return false; std::cout << "here2\n";
+		}
+		while (symbol != ',' && symbol!=' ')
+		{
+			char* word_temp;
+			word_temp = new(std::nothrow)char[counter+2];
+			if (word_temp == nullptr)
+			{
+				delete[] word;
+				std::cout << "here1\n";
+				return false;
+			}
+			strcpy(word_temp, word);
+			word_temp[counter] = symbol;
+			word_temp[counter + 1] = '\0';
+			delete[] word;
+			word = word_temp;
+		}*/
+		std::cout << word << std::endl;
+		if (matrix[current_height][current_width].Initialize(word) == false)
+		{
+			std::cout << "Column:" << current_height + 1 << " Line:" << current_width;
+			//add delete
+			return false;
+		}
+		//delete[]word;
 	}
+	file.close();
+	return true;
 }
 
 void Table::save()
@@ -173,7 +222,7 @@ void Table::save_as(char* _file)
 	{
 		for (size_t j = 0; j < width &&file.good(); ++j)
 		{
-			file << matrix[i][j];
+			//file << matrix[i][j];
 		}
 		file << '\n';
 	}
@@ -182,7 +231,7 @@ void Table::save_as(char* _file)
 
 void Table::print()
 {
-	size_t max_lenght = 0;
+	//size_t max_lenght = 0;
 	/*for (size_t i = 0; i <width ; ++i)
 	{
 		for (size_t j = 0; j < height; ++j)
@@ -195,10 +244,14 @@ void Table::print()
 		
 		for (size_t j = 0; j < width; ++j)
 		{
-			//std::cout << std::setw(max_lenght)<<matrix[i][j];
+			if (matrix[i][j].get_initial_text() != nullptr)
+				std::cout << std::setw(10) << matrix[i][j].get_initial_text();
+			else
+				std::cout << " ";
 			if (i != height - 1)
 				std::cout << "|";
 		}
 		std::cout << std::endl;
 	}
+	return;
 }

@@ -139,11 +139,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="Cell_Float.cpp" />
+    <ClCompile Include="Cell_Formula.cpp" />
+    <ClCompile Include="Cell_Int.cpp" />
+    <ClCompile Include="Cell_String.cpp" />
     <ClCompile Include="Electronic _Table.cpp" />
     <ClCompile Include="Table.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="Cell_Float.h" />
+    <ClInclude Include="Cell_Formula.h" />
+    <ClInclude Include="Cell_Int.h" />
+    <ClInclude Include="Cell_String.h" />
     <ClInclude Include="Table.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
