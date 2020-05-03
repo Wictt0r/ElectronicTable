@@ -18,9 +18,19 @@
 //	return in;
 //}
 
+Cell::Cell(const Cell& other)
+{
+	copy(other);
+}
+
+Cell::~Cell()
+{
+	del();
+}
+
 bool Cell::Initialize(char* input)
 {
-	if (input[0] == '+' || input[0] == '-' || (input[0]>=0 && input[0]<=9))
+	if (input[0] == '+' || input[0] == '-' || (input[0]>='0' && input[0]<='9'))
 	{
 	
 		size_t dot_counter = 0,i=0;
@@ -64,6 +74,27 @@ bool Cell::Initialize(char* input)
 		return true;
 		// is formula correct
 	}
+}
+Cell* Cell::operator=(const Cell& other)
+{
+	if(this!=&other)
+	{ 
+	del();
+	copy(other);
+	}
+	return this;
+}
+void Cell::copy(const Cell& other)
+{
+	strcpy(type, other.type);
+	initial_text = new(std::nothrow)char[strlen(other.initial_text) + 1];
+	strcpy(initial_text, other.initial_text);
+	cell_type = other.cell_type;
+}
+void Cell::del()
+{
+	delete[] initial_text;
+	delete cell_type;
 }
 //cout<<
 //cin>>

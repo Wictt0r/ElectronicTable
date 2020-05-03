@@ -198,10 +198,12 @@ bool Table::open(char* _file)
 		std::cout << word << std::endl;
 		if (matrix[current_height][current_width].Initialize(word) == false)
 		{
+			
 			std::cout << "Column:" << current_height + 1 << " Line:" << current_width;
 			//add delete
 			return false;
 		}
+		std::cout << matrix[current_height][current_width].get_initial_text() << std::endl;
 		//delete[]word;
 	}
 	file.close();

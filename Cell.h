@@ -10,9 +10,14 @@ class Cell
 {
 public:
 	Cell() :type("empty"), initial_text(nullptr), cell_type(nullptr){};
+	Cell(const Cell&);
+	~Cell();
 	bool Initialize(char*);
+	Cell* operator=(const Cell&);
 	
 	char* get_initial_text() { return initial_text; }
+	void copy(const Cell&);
+	void del();
 	float sum();
 
 protected:
