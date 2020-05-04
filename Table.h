@@ -28,5 +28,6 @@ private:
 	void save();
 	void save_as(char*);
 	void print();
+	bool is_default();
 };
 

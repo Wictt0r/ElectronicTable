@@ -78,6 +78,11 @@ void Table::detect_function(char** split_input, size_t lenght)
 {
 	if (strcmp(split_input[0],"open")==0)
 	{
+		if (is_default() == false)
+		{
+			std::cout << "Error\nClose current table first\n";
+			return;
+		}
 		if (open(split_input[1]) == true)
 		{
 			std::cout << "Table added successfully\n";
@@ -91,7 +96,15 @@ void Table::detect_function(char** split_input, size_t lenght)
 	}
 	if (strcmp(split_input[0], "close") == 0)
 	{
-		//????
+		if (is_default() == false)
+		{
+			std::cout << "Closing current table\n";
+			close();
+		}
+		else
+			std::cout << "No active table\n";
+		
+		return;
 	}
 	if (strcmp(split_input[0], "print") == 0)
 	{
@@ -100,7 +113,7 @@ void Table::detect_function(char** split_input, size_t lenght)
 	}
 	if (strcmp(split_input[0], "edit") == 0)
 	{
-
+		
 	}
 	if (strcmp(split_input[0], "save") == 0 && strcmp(split_input[1],"as")==0 && lenght==3)
 	{
@@ -239,6 +252,13 @@ bool Table::open(char* _file)
 	return true;
 }
 
+void Table::close()
+{
+	del();
+	width = 0;
+	height = 0;
+}
+
 void Table::save()
 {
 	save_as(file_name);
@@ -265,27 +285,41 @@ void Table::save_as(char* _file)
 
 void Table::print()
 {
-	//size_t max_lenght = 0;
-	/*for (size_t i = 0; i <width ; ++i)
+	size_t* max_lenght=new(std::nothrow)size_t[width];
+	if (max_lenght == nullptr)
 	{
+		std::cout << "Error\n";
+		return;
+	}
+	for (size_t i = 0; i <width ; ++i)
+	{
+		max_lenght[i] = 1;
 		for (size_t j = 0; j < height; ++j)
 		{
-
+			if (matrix[j][i].get_initial_text()!=nullptr && max_lenght[i] < strlen(matrix[j][i].get_initial_text()))
+				max_lenght[i] = strlen(matrix[j][i].get_initial_text());
 		}
-	}*/
+	}
 	for (size_t i = 0; i < height; ++i)
 	{
 		
 		for (size_t j = 0; j < width; ++j)
 		{
 			if (matrix[i][j].get_initial_text() != nullptr)
-				std::cout << std::setw(10) << matrix[i][j].get_initial_text();
+				std::cout << std::setw(max_lenght[j]) << matrix[i][j].get_initial_text();
 			else
-				std::cout << " ";
-			if (i != width - 1)
+				std::cout << std::setw(max_lenght[j])<<" ";
+			if (j != width - 1)
 				std::cout << "|";
 		}
 		std::cout << std::endl;
 	}
 	return;
+}
+
+bool Table::is_default()
+{
+	if (file_name == nullptr && matrix == nullptr && width == 0 && height == 0)
+		return true;
+	return false;
 }
