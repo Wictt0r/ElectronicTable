@@ -1,5 +1,7 @@
 #pragma warning(disable:4996)
 #include "Table.h"
+#include"Cell.h"
+#include"Cell_Factory.h"
 
 Table::Table():width(0),height(0),matrix(nullptr){}
 
@@ -166,28 +168,40 @@ bool Table::set_Parameters(char* _file)
 			width_counter = 1;
 		}
 	}
-	matrix = new(std::nothrow)  Cell * [height];
+	file.close();
+	if (create_matrix() == false)
+		return false;
+	std::cout << "width:" << width << " height:" << height << std::endl;
+	return true;
+}
+
+bool Table::create_matrix()
+{
+
+	matrix = new(std::nothrow)  Cell **[height];
 	if (matrix == nullptr)
 	{
-		file.close();
 		del();
 		return false;
 	}
 	for (size_t i = 0; i < height; ++i)
 	{
-		matrix[i] = new(std::nothrow) Cell[width];
+		matrix[i] = new(std::nothrow) Cell * [width];
 		if (matrix[i] == nullptr)
 		{
 			del();
-			file.close();
 			return false;
 		}
 	}
-	std::cout << "width:" << width << " height:" << height << std::endl;
-	file.close();
+	for (size_t i = 0; i < height; ++i)
+	{
+		for (size_t j = 0; j < width; ++j)
+		{
+			matrix[i][j] = nullptr;
+		}
+	}
 	return true;
 }
-
 char* Table::read_word(std::ifstream& file, char &symbol)
 {
 	char word[128],character;
@@ -227,7 +241,8 @@ bool Table::open(char* _file)
 			current_height++;
 			continue;
 		}
-		if (matrix[current_height][current_width].Initialize(word) == false)
+		matrix[current_height][current_width] = Cell_Factory::Initialize(word);
+		if(matrix[current_height][current_width]==nullptr)
 		{
 			std::cout << "Column:" << current_width +1<< " Line:" << current_height+1; 
 			del();
@@ -273,8 +288,8 @@ void Table::save_as(char* _file)
 	{
 		for (size_t j = 0; j < width &&file.good(); ++j)
 		{
-			if(matrix[i][j].get_initial_text()!=nullptr)
-			file << matrix[i][j].get_initial_text();
+			if(matrix[i][j]->get_initial_text()!=nullptr)
+			file << matrix[i][j]->get_initial_text();
 			if (j != width - 1)
 				file << ',';
 		}
@@ -296,20 +311,19 @@ void Table::print()
 		max_lenght[i] = 1;
 		for (size_t j = 0; j < height; ++j)
 		{
-			if (matrix[j][i].get_initial_text()!=nullptr && max_lenght[i] < strlen(matrix[j][i].get_initial_text()))
-				max_lenght[i] = strlen(matrix[j][i].get_initial_text());
+			if (matrix[j][i]!=nullptr && max_lenght[i] < strlen(matrix[j][i]->get_initial_text()))
+				max_lenght[i] = strlen(matrix[j][i]->get_initial_text());
 		}
 	}
 	for (size_t i = 0; i < height; ++i)
 	{
-		
+		std::cout << "|";
 		for (size_t j = 0; j < width; ++j)
 		{
-			if (matrix[i][j].get_initial_text() != nullptr)
-				std::cout << std::setw(max_lenght[j]) << matrix[i][j].get_initial_text();
+			if (matrix[i][j] != nullptr)
+				std::cout << std::setw(max_lenght[j]) << matrix[i][j]->get_initial_text();
 			else
 				std::cout << std::setw(max_lenght[j])<<" ";
-			if (j != width - 1)
 				std::cout << "|";
 		}
 		std::cout << std::endl;

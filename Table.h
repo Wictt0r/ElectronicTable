@@ -17,11 +17,12 @@ public:
 private:
 	char* file_name;
 	size_t width, height;
-	Cell** matrix;
+	Cell*** matrix;
 	
 	void detect_function(char**,size_t);
 	char skip_widespace(std::ifstream&,char);
 	bool set_Parameters(char*);
+	bool create_matrix();
 	char* read_word(std::ifstream&, char&);
 	bool open(char*);
 	void close();

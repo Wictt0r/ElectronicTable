@@ -36,6 +36,9 @@
     <ClCompile Include="Cell_Formula.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cell_Factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Table.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Cell_Formula.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cell_Factory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
