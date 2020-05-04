@@ -12,6 +12,7 @@ public:
 	Table();
 	~Table();
 	void split_input(char*, size_t);
+	void del();
 
 private:
 	char* file_name;
@@ -19,6 +20,9 @@ private:
 	Cell** matrix;
 	
 	void detect_function(char**,size_t);
+	char skip_widespace(std::ifstream&,char);
+	bool set_Parameters(char*);
+	char* read_word(std::ifstream&, char&);
 	bool open(char*);
 	void close();
 	void save();

@@ -52,27 +52,44 @@ bool Cell::Initialize(char* input)
 		{
 			strcpy(type, "int");
 			cell_type = new Cell_Int;
+			initial_text=new (std::nothrow) char[strlen(input)+1];
+			strcpy(initial_text, input);
 			return true;
 		}
 		if (dot_counter == 1)
 		{
 			strcpy(type, "float");
 			cell_type = new Cell_Float;
+			initial_text = new (std::nothrow) char[strlen(input) + 1];
+			strcpy(initial_text, input);
 			return true;
 		}
+		if (dot_counter>1)
+		{
+			std::cout << "Unknown type:" << input;
+			return false;
+		}
 	}
-	if (input[0] == '"' && input[strlen(input)] == '"')
+	else if (input[0] == '\"' && input[strlen(input)-1] == '\"')
 	{
 		strcpy(type, "string");
 		cell_type = new Cell_String;
+		initial_text = new (std::nothrow) char[strlen(input) + 1];
+		strcpy(initial_text, input);
 		return true;
 	}
-	if (input[0] == '=')
+	else if (input[0] == '=')
 	{
 		strcpy(type, "formula");
 		cell_type = new Cell_Formula;
+		initial_text = new (std::nothrow) char[strlen(input) + 1];
+		strcpy(initial_text, input);
 		return true;
 		// is formula correct
+	}
+	else {
+		std::cout << "Unknown type:" << input;
+		return false;
 	}
 }
 Cell* Cell::operator=(const Cell& other)

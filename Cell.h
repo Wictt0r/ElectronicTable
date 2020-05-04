@@ -16,6 +16,7 @@ public:
 	Cell* operator=(const Cell&);
 	
 	char* get_initial_text() { return initial_text; }
+	char* get_type() { return type; }
 	void copy(const Cell&);
 	void del();
 	float sum();
