@@ -35,5 +35,6 @@ private:
 	size_t find_max_width();
 	size_t* find_setw();
 	bool is_default();
+	
 };
 

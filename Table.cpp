@@ -121,11 +121,13 @@ void Table::detect_function(char** split_input, size_t lenght)
 	if (strcmp(split_input[0], "save") == 0 && strcmp(split_input[1],"as")==0 && lenght==3)
 	{
 		save_as(split_input[2]);
+		std::cout << "Table saved as:" << split_input[2] << std::endl;
 		return;
 	}
 	if (strcmp(split_input[0], "save") == 0 && lenght==1)
 	{
 		save();
+		std::cout << "Table saved\n";
 		return;
 	}
 	if (strcmp(split_input[0], "help") == 0)
@@ -144,6 +146,7 @@ char Table::skip_widespace(std::ifstream& file,char symbol)
 	}
 	return symbol;
 }
+
 bool Table::set_Parameters(char* _file)
 {
 	file_name = new(std::nothrow)char[strlen(_file) + 1];
@@ -247,6 +250,7 @@ char* Table::read_word(std::ifstream& file, char &symbol)
 		file.get(character);
 	}
 	word[symbol_counter] = '\0';
+	character = skip_widespace(file, character);
 	symbol = character;
 	return word;
 }
@@ -263,16 +267,21 @@ bool Table::open(char* _file)
 	{
 		char symbol, word[128];
 		strcpy(word, read_word(file, symbol));
-		if (strlen(word) == 0 )
+		if (strlen(word) == 0 && symbol=='\n')
 		{
 			current_width = 0;
 			current_height++;
 			continue;
 		}
+		if (strlen(word) == 0)
+		{
+			current_width++;
+			continue;
+		}
 		matrix[current_height][current_width] = Cell_Factory::Initialize(word);
 		if(matrix[current_height][current_width]==nullptr)
 		{
-			std::cout << "Column:" << current_width +1<< " Line:" << current_height+1; 
+			std::cout << " Column:" << current_width +1<< " Line:" << current_height+1; 
 			del();
 			return false;
 		}
@@ -395,3 +404,4 @@ bool Table::is_default()
 		return true;
 	return false;
 }
+
