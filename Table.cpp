@@ -3,7 +3,7 @@
 #include"Cell.h"
 #include"Cell_Factory.h"
 
-Table::Table():width(0),height(0),matrix(nullptr){}
+Table::Table():width(nullptr),height(0),matrix(nullptr),file_name(nullptr){}
 
 Table::~Table()
 {
@@ -74,6 +74,7 @@ void Table::del()
 	for (size_t i = 0; i < height; ++i)
 		delete[] matrix[i];
 	delete[] matrix;
+	delete[] width;
 }
 
 void Table::detect_function(char** split_input, size_t lenght)
@@ -149,29 +150,55 @@ bool Table::set_Parameters(char* _file)
 	if (file_name == nullptr)
 		return false;
 	strcpy(file_name, _file);
+	
+	set_height(_file);
+	set_width(_file);
+	if (create_matrix() == false)
+		return false;
+	std::cout << " height:" << height << std::endl;
+	return true;
+}
+
+void Table::set_height(char* _file)
+{
+	height = 0;
 	std::ifstream file;
 	file.open(_file);
-	size_t width_counter = 1;
-	height = 0;
-	width = 1;
 	while (file.good())
 	{
 		char character;
 		file.get(character);
-		if (character == ',' && file.eof()==false)
-			width_counter++;
 		if (character == '\n' || file.eof() == true)
 		{
 			height++;
-			if (width < width_counter)
-				width = width_counter;
-			width_counter = 1;
 		}
 	}
 	file.close();
-	if (create_matrix() == false)
+	return;
+}
+
+bool Table::set_width(char* _file)
+{
+	width = new(std::nothrow) size_t[height];
+	if (width == nullptr)
 		return false;
-	std::cout << "width:" << width << " height:" << height << std::endl;
+	size_t width_counter = 0,line_counter=0;
+	std::ifstream file;
+	file.open(_file);
+	while (file.good())
+	{
+		char character;
+		file.get(character);
+		if (character == ',' && file.eof() == false)
+			width_counter++;
+		if (character == '\n' || file.eof() == true)
+		{
+			width_counter++;
+			width[line_counter] = width_counter;
+			line_counter++;
+			width_counter = 0;
+		}
+	}
 	return true;
 }
 
@@ -186,7 +213,7 @@ bool Table::create_matrix()
 	}
 	for (size_t i = 0; i < height; ++i)
 	{
-		matrix[i] = new(std::nothrow) Cell * [width];
+		matrix[i] = new(std::nothrow) Cell * [width[i]];
 		if (matrix[i] == nullptr)
 		{
 			del();
@@ -195,13 +222,14 @@ bool Table::create_matrix()
 	}
 	for (size_t i = 0; i < height; ++i)
 	{
-		for (size_t j = 0; j < width; ++j)
+		for (size_t j = 0; j < width[i]; ++j)
 		{
 			matrix[i][j] = nullptr;
 		}
 	}
 	return true;
 }
+
 char* Table::read_word(std::ifstream& file, char &symbol)
 {
 	char word[128],character;
@@ -270,7 +298,9 @@ bool Table::open(char* _file)
 void Table::close()
 {
 	del();
-	width = 0;
+	file_name = nullptr;
+	matrix = nullptr;
+	width = nullptr;
 	height = 0;
 }
 
@@ -286,11 +316,11 @@ void Table::save_as(char* _file)
 	file.open(_file,std::ios::trunc);
 	for (size_t i = 0; i < height && file.good(); ++i)
 	{
-		for (size_t j = 0; j < width &&file.good(); ++j)
+		for (size_t j = 0; j < width[i] &&file.good(); ++j)
 		{
-			if(matrix[i][j]->get_initial_text()!=nullptr)
+			if(matrix[i][j]!=nullptr)
 			file << matrix[i][j]->get_initial_text();
-			if (j != width - 1)
+			if (j != width[i] - 1)
 				file << ',';
 		}
 		file << '\n';
@@ -300,27 +330,20 @@ void Table::save_as(char* _file)
 
 void Table::print()
 {
-	size_t* max_lenght=new(std::nothrow)size_t[width];
+	size_t max_width = find_max_width();
+	size_t* max_lenght =find_setw();
 	if (max_lenght == nullptr)
 	{
 		std::cout << "Error\n";
 		return;
 	}
-	for (size_t i = 0; i <width ; ++i)
-	{
-		max_lenght[i] = 1;
-		for (size_t j = 0; j < height; ++j)
-		{
-			if (matrix[j][i]!=nullptr && max_lenght[i] < strlen(matrix[j][i]->get_initial_text()))
-				max_lenght[i] = strlen(matrix[j][i]->get_initial_text());
-		}
-	}
+	
 	for (size_t i = 0; i < height; ++i)
 	{
 		std::cout << "|";
-		for (size_t j = 0; j < width; ++j)
+		for (size_t j = 0; j < max_width; ++j)
 		{
-			if (matrix[i][j] != nullptr)
+			if (matrix[i][j] != nullptr && j<width[i])
 				std::cout << std::setw(max_lenght[j]) << matrix[i][j]->get_initial_text();
 			else
 				std::cout << std::setw(max_lenght[j])<<" ";
@@ -331,9 +354,44 @@ void Table::print()
 	return;
 }
 
+size_t Table::find_max_width()
+{
+	size_t max_width_temp = 0;
+	for (size_t i = 0; i < height; ++i)
+		if (width[i] > max_width_temp)max_width_temp = width[i];
+	return max_width_temp;
+}
+
+size_t* Table::find_setw()
+{
+	size_t* max_lenght_temp = new(std::nothrow)size_t[find_max_width()];
+	if (max_lenght_temp == nullptr)
+		return nullptr;
+	for (size_t i = 0; i < height; ++i)
+	{
+		for (size_t j = 0; j < width[i]; ++j)
+		{
+
+			max_lenght_temp[j] = 1;
+		}
+
+	}
+	for (size_t i = 0; i < height; ++i)
+	{
+		for (size_t j = 0; j < width[i]; ++j)
+		{
+			
+			if (matrix[i][j]!=nullptr && max_lenght_temp[j] < strlen(matrix[i][j]->get_initial_text()))
+				max_lenght_temp[j] = strlen(matrix[i][j]->get_initial_text());
+		}
+
+	}
+	return max_lenght_temp;
+}
+
 bool Table::is_default()
 {
-	if (file_name == nullptr && matrix == nullptr && width == 0 && height == 0)
+	if (file_name == nullptr && matrix == nullptr && width == nullptr && height == 0)
 		return true;
 	return false;
 }
