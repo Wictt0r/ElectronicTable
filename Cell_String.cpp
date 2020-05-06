@@ -1,5 +1,4 @@
 #include "Cell_String.h"
-
 Cell_String::Cell_String(char* input)
 {
 	initial_text = new(std::nothrow) char[strlen(input) + 1];

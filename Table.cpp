@@ -5,12 +5,25 @@
 
 Table::Table():width(nullptr),height(0),matrix(nullptr),file_name(nullptr){}
 
+Table::Table(const Table& other)
+{
+	copy(other);
+}
+
 Table::~Table()
 {
 	for (size_t i = 0; i < height; ++i)
 		delete[] matrix[i];
 	delete[] matrix;
 	delete[] file_name;
+}
+
+Table* Table::operator=(const Table& other)
+{
+	if (this == &other)
+		return this;
+	copy(other);
+	return this;
 }
 
 void Table::split_input(char*input, size_t lenght)
@@ -72,6 +85,13 @@ void Table::del()
 {
 	delete[] file_name;
 	for (size_t i = 0; i < height; ++i)
+	{
+		for (size_t j = 0; j < width[i]; ++j)
+		{
+			matrix[i][j]->~Cell();
+		}
+	}
+	for (size_t i = 0; i < height; ++i)
 		delete[] matrix[i];
 	delete[] matrix;
 	delete[] width;
@@ -116,7 +136,16 @@ void Table::detect_function(char** split_input, size_t lenght)
 	}
 	if (strcmp(split_input[0], "edit") == 0)
 	{
-		
+		if (is_default() == true)
+		{
+			std::cout << "No active table\n";
+			return;
+		}
+		if (edit(split_input,lenght) == false)
+		{
+			std::cout << "Error\nNo changes made\n";
+		}
+		return;
 	}
 	if (strcmp(split_input[0], "save") == 0 && strcmp(split_input[1],"as")==0 && lenght==3)
 	{
@@ -136,6 +165,7 @@ void Table::detect_function(char** split_input, size_t lenght)
 	}
 	if (strcmp(split_input[0], "exit") != 0 || lenght > 1)
 		std::cout << "Invalid input\n";
+	return;
 }
 
 char Table::skip_widespace(std::ifstream& file,char symbol)
@@ -156,7 +186,7 @@ bool Table::set_Parameters(char* _file)
 	
 	set_height(_file);
 	set_width(_file);
-	if (create_matrix() == false)
+	if (create_matrix(height,width) == false)
 		return false;
 	std::cout << " height:" << height << std::endl;
 	return true;
@@ -205,27 +235,27 @@ bool Table::set_width(char* _file)
 	return true;
 }
 
-bool Table::create_matrix()
+bool Table::create_matrix(size_t _height,size_t* _width)
 {
 
-	matrix = new(std::nothrow)  Cell **[height];
+	matrix = new(std::nothrow)  Cell **[_height];
 	if (matrix == nullptr)
 	{
 		del();
 		return false;
 	}
-	for (size_t i = 0; i < height; ++i)
+	for (size_t i = 0; i < _height; ++i)
 	{
-		matrix[i] = new(std::nothrow) Cell * [width[i]];
+		matrix[i] = new(std::nothrow) Cell * [_width[i]];
 		if (matrix[i] == nullptr)
 		{
 			del();
 			return false;
 		}
 	}
-	for (size_t i = 0; i < height; ++i)
+	for (size_t i = 0; i < _height; ++i)
 	{
-		for (size_t j = 0; j < width[i]; ++j)
+		for (size_t j = 0; j < _width[i]; ++j)
 		{
 			matrix[i][j] = nullptr;
 		}
@@ -311,6 +341,25 @@ void Table::close()
 	matrix = nullptr;
 	width = nullptr;
 	height = 0;
+}
+
+void Table::copy(const Table& other)
+{
+	file_name = new(std::nothrow) char[strlen(other.file_name) + 1];
+	if (file_name == nullptr)
+		return;
+	strcpy(file_name, other.file_name);
+	if (create_matrix(other.height, other.width) == false)
+		return;
+	height = other.height;
+	width = new(std::nothrow)size_t[height];
+	if (width == nullptr)
+	{
+		del();
+		return;
+	}
+	for (size_t i = 0; i < height; ++i)
+		width[i] = other.width[i];
 }
 
 void Table::save()
@@ -404,4 +453,106 @@ bool Table::is_default()
 		return true;
 	return false;
 }
+bool Table::resize_line(size_t edit_height, size_t edit_width)
+{
+	Cell** line_temp = new(std::nothrow) Cell * [edit_width + 1];
+	if (line_temp == nullptr)
+		return false;
+	for (size_t i = 0; i < edit_width + 1; ++i)
+		line_temp[i] = nullptr;
+	for (size_t i = 0; i < width[edit_height]; ++i)
+	{
+		line_temp[i] = matrix[edit_height][i];
 
+	}
+	for (size_t i = width[edit_height]; i < edit_width; ++i)
+		line_temp[i] = nullptr;
+	delete[] matrix[edit_height];
+	width[edit_height] = edit_width + 1;
+	matrix[edit_height] = line_temp;
+
+	
+	return true;
+
+}
+bool Table::edit_create_new_word(char**split_input,size_t lenght,char*& new_cell)
+{
+	size_t symbol_counter = 0;
+	for (size_t i = 2; i < lenght; ++i)
+	{
+		symbol_counter += strlen(split_input[i]) + 1;
+	}
+	new_cell = new(std::nothrow) char[symbol_counter];
+	if (new_cell == nullptr)
+		return false;
+	return true;
+}
+void Table::edit_initialize_new_word(char** split_input, size_t lenght, char*& new_cell)
+{
+	strcpy(new_cell, split_input[2]);
+	if (lenght > 3)
+		strcat(new_cell, " ");
+	for (size_t i = 3; i < lenght; ++i)
+	{
+		strcat(new_cell, split_input[i]);
+		if (i != lenght - 1)
+		{
+			strcat(new_cell, " ");
+		}
+	}
+	return;
+}
+bool Table::edit(char** split_input,size_t lenght)
+{
+	size_t edit_height = 0, edit_width = 0;
+	char* new_cell;
+	if (lenght<3 || detect_cell(split_input[1], edit_height, edit_width) == false || edit_create_new_word(split_input, lenght, new_cell) == false)
+		return false;
+	if (edit_height >= height || edit_width >= find_max_width())
+	{
+		std::cout << "Cell otside table\n";
+		return false;
+	}
+	if (edit_width >= width[edit_height])
+	{
+		resize_line(edit_height, edit_width);
+	}
+	edit_initialize_new_word(split_input, lenght, new_cell);
+	if(matrix[edit_height][edit_width]!=nullptr)
+	matrix[edit_height][edit_width]->~Cell();
+	matrix[edit_height][edit_width] = Cell_Factory::Initialize(new_cell);
+}
+
+bool Table::detect_cell(char*_cell,size_t& _height,size_t& _width)
+{
+	if (_cell[0] != 'R' && _cell[0] != 'r')
+		return false;
+	bool flag = false;
+	size_t symbol_counter = strlen(_cell)-1, counter = 0, number_temp=0;
+	while (symbol_counter > 0)
+	{
+		if (_cell[symbol_counter] == 'C' || _cell[symbol_counter] == 'c')
+		{
+
+			_width = number_temp - 1;
+			counter = 0;
+			number_temp = 0;
+			flag = true;
+			symbol_counter--;
+			continue;
+		}
+		if (_cell[symbol_counter] < '0' || _cell[symbol_counter] > '9')
+		{
+			_width = 0;
+			flag = false;
+			break;
+		}
+		number_temp += (_cell[symbol_counter]-'0') * pow(10, counter);
+		symbol_counter--;
+		counter++;
+	}
+	if(flag==true)
+	_height = number_temp-1;
+	std::cout << "width:" << _width << "height:" << _height << std::endl;
+	return flag;
+}

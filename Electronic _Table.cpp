@@ -5,6 +5,7 @@
 int main()
 {
 	Table table;
+	
 	char input[100];
 	do
 	{

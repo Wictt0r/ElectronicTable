@@ -24,23 +24,23 @@ Cell* Cell_Factory::Initialize(char* input)
 			}
 			if (dot_counter == 0)
 			{
-				new_cell = new Cell_Int(input);
+				new_cell = new(std::nothrow) Cell_Int(input);
 				return new_cell;
 			}
 			if (dot_counter == 1)
 			{
-				new_cell = new Cell_Float(input);
+				new_cell = new(std::nothrow) Cell_Float(input);
 				return new_cell;
 			}
 		}
 		else if (input[0] == '\"' && input[strlen(input) - 1] == '\"')
 		{
-			new_cell = new Cell_String(input);
+			new_cell = new (std::nothrow)Cell_String(input);
 			return new_cell;
 		}
 		else if (input[0] == '=')
 		{
-			new_cell = new Cell_Formula(input);
+			new_cell = new(std::nothrow) Cell_Formula(input);
 			return new_cell;
 			// is formula correct
 		}
