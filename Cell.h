@@ -16,7 +16,12 @@ public:
 	char* get_type() { return type; }
 	void copy(const Cell&);
 	void del();
-	virtual float value()=0;
+	virtual float value() = 0;
+	virtual char* print() = 0;
+	virtual void calculate(Cell***,size_t,size_t*,size_t,size_t) = 0;
+	static float str_to_float(char*);
+	static bool detect_cell(char*, size_t&, size_t&);
+	static char* float_to_str(float);
 
 protected:
 	char type[7];

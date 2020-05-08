@@ -7,9 +7,9 @@ class Cell_Float : public Cell
 public:
 	Cell_Float(char*);
 	float value();
+	char* print();
+	
 private:
-	float number_f;
-
-	float str_to_float(char*);
+	void calculate(Cell***, size_t, size_t*, size_t, size_t);
 };
 

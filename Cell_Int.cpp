@@ -6,10 +6,19 @@ Cell_Int::Cell_Int(char*input)
 	if (initial_text != nullptr)
 		strcpy(initial_text, input);
 	strcpy(type, "int");
-	number_i = atoi(input);
 }
 
 float Cell_Int::value()
 {
-	return number_i;
+	return atoi(initial_text);
+}
+
+char* Cell_Int::print()
+{
+	return initial_text;
+}
+
+void Cell_Int::calculate(Cell***, size_t, size_t*,size_t,size_t)
+{
+	return;
 }

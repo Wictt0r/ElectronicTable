@@ -12,10 +12,7 @@ Table::Table(const Table& other)
 
 Table::~Table()
 {
-	for (size_t i = 0; i < height; ++i)
-		delete[] matrix[i];
-	delete[] matrix;
-	delete[] file_name;
+	del();
 }
 
 Table* Table::operator=(const Table& other)
@@ -88,6 +85,7 @@ void Table::del()
 	{
 		for (size_t j = 0; j < width[i]; ++j)
 		{
+			if(matrix[i][j]!=nullptr)
 			matrix[i][j]->~Cell();
 		}
 	}
@@ -95,6 +93,17 @@ void Table::del()
 		delete[] matrix[i];
 	delete[] matrix;
 	delete[] width;
+}
+
+void Table::calculate_formulas()
+{
+	for (size_t i = 0; i < height; ++i)
+		for (size_t j = 0; j < width[i]; ++j)
+		{ 
+			if(matrix[i][j]!=nullptr)
+			matrix[i][j]->calculate(matrix, height, width,i,j);
+		}
+	return;
 }
 
 void Table::detect_function(char** split_input, size_t lenght)
@@ -179,24 +188,24 @@ char Table::skip_widespace(std::ifstream& file,char symbol)
 
 bool Table::set_Parameters(char* _file)
 {
+	if (set_height(_file) == false || set_width(_file) == false)
+		return false;
 	file_name = new(std::nothrow)char[strlen(_file) + 1];
 	if (file_name == nullptr)
 		return false;
 	strcpy(file_name, _file);
-	
-	set_height(_file);
-	set_width(_file);
-	if (create_matrix(height,width) == false)
-		return false;
+
 	std::cout << " height:" << height << std::endl;
 	return true;
 }
 
-void Table::set_height(char* _file)
+bool Table::set_height(char* _file)
 {
 	height = 0;
 	std::ifstream file;
 	file.open(_file);
+	if (file.is_open() == false)
+		return false;
 	while (file.good())
 	{
 		char character;
@@ -207,17 +216,19 @@ void Table::set_height(char* _file)
 		}
 	}
 	file.close();
-	return;
+	return true;
 }
 
 bool Table::set_width(char* _file)
 {
-	width = new(std::nothrow) size_t[height];
-	if (width == nullptr)
-		return false;
 	size_t width_counter = 0,line_counter=0;
 	std::ifstream file;
 	file.open(_file);
+	if (file.is_open() == false)
+		return false;
+	width = new(std::nothrow) size_t[height];
+	if (width == nullptr)
+		return false;
 	while (file.good())
 	{
 		char character;
@@ -289,9 +300,13 @@ bool Table::open(char* _file)
 {
 	if (set_Parameters(_file) == false)
 		return false;
+	if (create_matrix(height, width) == false)
+		return false;
 	size_t current_width = 0, current_height = 0;
 	std::ifstream file;
 	file.open(_file);
+	if (file.is_open() == false)
+		return false;
 	
 	while (file.good())
 	{
@@ -388,6 +403,7 @@ void Table::save_as(char* _file)
 
 void Table::print()
 {
+	calculate_formulas();
 	size_t max_width = find_max_width();
 	size_t* max_lenght =find_setw();
 	if (max_lenght == nullptr)
@@ -402,7 +418,7 @@ void Table::print()
 		for (size_t j = 0; j < max_width; ++j)
 		{
 			if (matrix[i][j] != nullptr && j<width[i])
-				std::cout << std::setw(max_lenght[j]) << matrix[i][j]->get_initial_text();
+				std::cout << std::setw(max_lenght[j]) << matrix[i][j]->print();
 			else
 				std::cout << std::setw(max_lenght[j])<<" ";
 				std::cout << "|";
@@ -439,8 +455,8 @@ size_t* Table::find_setw()
 		for (size_t j = 0; j < width[i]; ++j)
 		{
 			
-			if (matrix[i][j]!=nullptr && max_lenght_temp[j] < strlen(matrix[i][j]->get_initial_text()))
-				max_lenght_temp[j] = strlen(matrix[i][j]->get_initial_text());
+			if (matrix[i][j]!=nullptr && max_lenght_temp[j] < strlen(matrix[i][j]->print()))
+				max_lenght_temp[j] = strlen(matrix[i][j]->print());
 		}
 
 	}
@@ -506,7 +522,7 @@ bool Table::edit(char** split_input,size_t lenght)
 {
 	size_t edit_height = 0, edit_width = 0;
 	char* new_cell;
-	if (lenght<3 || detect_cell(split_input[1], edit_height, edit_width) == false || edit_create_new_word(split_input, lenght, new_cell) == false)
+	if (lenght<3 || Cell::detect_cell(split_input[1], edit_height, edit_width) == false || edit_create_new_word(split_input, lenght, new_cell) == false)
 		return false;
 	if (edit_height >= height || edit_width >= find_max_width())
 	{
@@ -521,38 +537,7 @@ bool Table::edit(char** split_input,size_t lenght)
 	if(matrix[edit_height][edit_width]!=nullptr)
 	matrix[edit_height][edit_width]->~Cell();
 	matrix[edit_height][edit_width] = Cell_Factory::Initialize(new_cell);
+	return true;
 }
 
-bool Table::detect_cell(char*_cell,size_t& _height,size_t& _width)
-{
-	if (_cell[0] != 'R' && _cell[0] != 'r')
-		return false;
-	bool flag = false;
-	size_t symbol_counter = strlen(_cell)-1, counter = 0, number_temp=0;
-	while (symbol_counter > 0)
-	{
-		if (_cell[symbol_counter] == 'C' || _cell[symbol_counter] == 'c')
-		{
 
-			_width = number_temp - 1;
-			counter = 0;
-			number_temp = 0;
-			flag = true;
-			symbol_counter--;
-			continue;
-		}
-		if (_cell[symbol_counter] < '0' || _cell[symbol_counter] > '9')
-		{
-			_width = 0;
-			flag = false;
-			break;
-		}
-		number_temp += (_cell[symbol_counter]-'0') * pow(10, counter);
-		symbol_counter--;
-		counter++;
-	}
-	if(flag==true)
-	_height = number_temp-1;
-	std::cout << "width:" << _width << "height:" << _height << std::endl;
-	return flag;
-}

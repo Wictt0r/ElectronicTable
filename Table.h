@@ -14,7 +14,7 @@ public:
 	~Table();
 	Table* operator=(const Table&);
 	void split_input(char*, size_t);
-	void del();
+	
 
 private:
 	char* file_name;
@@ -25,7 +25,7 @@ private:
 	void detect_function(char**,size_t);
 	char skip_widespace(std::ifstream&,char);
 	bool set_Parameters(char*);
-	void set_height(char*);
+	bool set_height(char*);
 	bool set_width(char*);
 	bool create_matrix(size_t,size_t*);
 	char* read_word(std::ifstream&, char&);
@@ -42,6 +42,8 @@ private:
 	bool edit_create_new_word(char**, size_t, char*&);
 	void edit_initialize_new_word(char**, size_t, char*&);
 	bool edit(char**,size_t);
-	bool detect_cell(char*,size_t&,size_t&);
+	
+	void del();
+	void calculate_formulas();
 };
 

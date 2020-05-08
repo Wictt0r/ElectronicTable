@@ -6,7 +6,9 @@ class Cell_Int : public Cell
 public:
 	Cell_Int(char*);
 	float value();
+	char* print();
 private:
-	int number_i;
+	void calculate(Cell***, size_t, size_t*, size_t, size_t);
+
 };
 
