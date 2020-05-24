@@ -150,13 +150,15 @@ void Table::detect_function(char** split_input, size_t lenght)
 			std::cout << "No active table\n";
 			return;
 		}
-		if (edit(split_input,lenght) == false)
+		if (edit(split_input,lenght) == true)
 		{
-			std::cout << "Error\nNo changes made\n";
+			std::cout << "Cell edited successfully\n";
 		}
+		else
+			std::cout << "Cell not edited\n";
 		return;
 	}
-	if (strcmp(split_input[0], "save") == 0 && strcmp(split_input[1],"as")==0 && lenght==3)
+	if (lenght==3 && strcmp(split_input[0], "save") == 0 && strcmp(split_input[1],"as")==0)
 	{
 		save_as(split_input[2]);
 		std::cout << "Table saved as:" << split_input[2] << std::endl;
@@ -170,7 +172,8 @@ void Table::detect_function(char** split_input, size_t lenght)
 	}
 	if (strcmp(split_input[0], "help") == 0)
 	{
-
+		help();
+		return;
 	}
 	if (strcmp(split_input[0], "exit") != 0 || lenght > 1)
 		std::cout << "Invalid input\n";
@@ -194,8 +197,6 @@ bool Table::set_Parameters(char* _file)
 	if (file_name == nullptr)
 		return false;
 	strcpy(file_name, _file);
-
-	std::cout << " height:" << height << std::endl;
 	return true;
 }
 
@@ -330,8 +331,6 @@ bool Table::open(char* _file)
 			del();
 			return false;
 		}
-		std::cout << "current_height:" << current_height << " current_width:" << current_width<<" ";
-		std::cout <<"word:" <<word << " " << std::endl;
 		symbol = skip_widespace(file, symbol);
 		if (symbol == ',')
 		{
@@ -429,6 +428,7 @@ void Table::print()
 		}
 		std::cout << std::endl;
 	}
+	delete[] max_lenght;
 	return;
 }
 
@@ -539,9 +539,26 @@ bool Table::edit(char** split_input,size_t lenght)
 	}
 	edit_initialize_new_word(split_input, lenght, new_cell);
 	if(matrix[edit_height][edit_width]!=nullptr)
-	matrix[edit_height][edit_width]->~Cell();
+	delete matrix[edit_height][edit_width];
 	matrix[edit_height][edit_width] = Cell_Factory::Initialize(new_cell);
+	if (matrix[edit_height][edit_width] == nullptr)
+	{
+		std::cout << "Previous Cell data lost\n";
+		return false;
+	}
 	return true;
+}
+
+void Table::help()
+{
+	std::cout << "The following commands are supported:\n";
+	std::cout << "open <file>: opens <file>\n";
+	std::cout << "close: closes currently opened file\n";
+	std::cout << "save: saves the current file\n";
+	std::cout << "save as <name>: saves current file as <name>\n";
+	std::cout << "help: prints this information\n";
+	std::cout << "print: prints the current table\n";
+	std::cout << "edit <Cell(R<line>C<column>)> <new text>: changes the given cell to <new text>\n";
 }
 
 

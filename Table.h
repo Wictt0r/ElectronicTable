@@ -42,6 +42,7 @@ public:
 	bool edit_create_new_word(char**, size_t, char*&);
 	void edit_initialize_new_word(char**, size_t, char*&);
 	bool edit(char**,size_t);
+	void help();
 	
 	void del();
 	void calculate_formulas();

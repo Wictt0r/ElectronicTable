@@ -72,7 +72,7 @@ char* Cell_String::remove_quotes()
 	{
 		if (initial_text[i] == '\\' && (initial_text[i+1]=='\\' || initial_text[i+1]=='\"'))
 		{
-			new_word[symbol_counter] = initial_text[i];
+			new_word[symbol_counter] = initial_text[i+1];
 			symbol_counter++;
 			++i;
 			continue;

@@ -8,7 +8,6 @@
 Cell::~Cell()
 {
 	del();
-	std::cout << "I destroy\n";
 }
 
 void Cell::del()
@@ -89,7 +88,6 @@ bool Cell::detect_cell(char* _cell, size_t& _height, size_t& _width)
 	}
 	if (flag == true)
 		_height = number_temp - 1;
-	std::cout << "width:" << _width << "height:" << _height << std::endl;
 	return flag;
 }
 

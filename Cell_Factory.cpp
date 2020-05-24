@@ -17,7 +17,7 @@ Cell* Cell_Factory::Initialize(char* input)
 					if (input[i] == '.')dot_counter++;
 					else
 					{
-						std::cout << "Unknown type:" << input;
+						std::cout << "Unknown type:" << input<<std::endl;
 						return nullptr;
 					}
 				}
@@ -46,7 +46,7 @@ Cell* Cell_Factory::Initialize(char* input)
 		}
 		else 
 		{
-			std::cout << "Unknown type:" << input;
+			std::cout << "Unknown type:" << input<<std::endl;
 			return nullptr;
 		}
 	
