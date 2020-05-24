@@ -1,10 +1,19 @@
 #include "Cell_String.h"
+Cell_String::Cell_String(const Cell_String& other)
+{
+	set_type(other.type);
+	set_initial_text(other.initial_text);
+}
 Cell_String::Cell_String(char* input)
 {
 	initial_text = new(std::nothrow) char[strlen(input) + 1];
 	if (initial_text != nullptr)
 		strcpy(initial_text, input);
 	strcpy(type, "string");
+}
+
+Cell_String::Cell_String():Cell()
+{
 }
 
 float Cell_String::value()
@@ -35,6 +44,11 @@ char* Cell_String::print()
 	return remove_quotes();
 }
 
+Cell* Cell_String::copy()
+{
+	return new (std::nothrow) Cell_String(*this);
+}
+
 void Cell_String::calculate(Cell***, size_t, size_t*,size_t,size_t)
 {
 	return;
@@ -56,8 +70,11 @@ char* Cell_String::remove_quotes()
 	size_t symbol_counter = 0;
 	for (size_t i = 1; i < strlen(initial_text) - 1; ++i)
 	{
-		if (initial_text[i] == '\\')
+		if (initial_text[i] == '\\' && (initial_text[i+1]=='\\' || initial_text[i+1]=='\"'))
 		{
+			new_word[symbol_counter] = initial_text[i];
+			symbol_counter++;
+			++i;
 			continue;
 		}
 		new_word[symbol_counter] = initial_text[i];

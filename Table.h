@@ -16,7 +16,7 @@ public:
 	void split_input(char*, size_t);
 	
 
-private:
+//private:
 	char* file_name;
 	size_t height;
 	size_t* width;

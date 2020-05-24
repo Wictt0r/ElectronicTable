@@ -7,6 +7,15 @@ Cell_Formula::Cell_Formula(char* input)
 	strcpy(initial_text, input);
 	strcpy(type, "formula");
 	value_of_formula = 0;
+	is_correct = true;
+}
+
+Cell_Formula::Cell_Formula(const Cell_Formula& other)
+{
+	set_type(other.type);
+	set_initial_text(other.initial_text);
+	value_of_formula = other.value_of_formula;
+	is_correct = other.is_correct;
 }
 
 float Cell_Formula::value()
@@ -16,7 +25,19 @@ float Cell_Formula::value()
 
 char* Cell_Formula::print()
 {
-	return float_to_str(value_of_formula);
+	if (is_correct == true)
+		return float_to_str(value_of_formula);
+	else 
+	{
+		static char error[] = "Error";
+		return error;
+	}
+
+}
+
+Cell* Cell_Formula::copy()
+{
+	return new(std::nothrow) Cell_Formula(*this);
 }
 
 void Cell_Formula::calculate(Cell*** matrix,size_t height,size_t* width,size_t current_height,size_t current_width)
@@ -29,15 +50,28 @@ void Cell_Formula::calculate(Cell*** matrix,size_t height,size_t* width,size_t c
 	number2= calculate_second_number(matrix, height, width, next_symbol, current_height, current_width);
 	
 	if (operation == '+')
+	{
 		value_of_formula = number1 + number2;
+		return;
+	}
 	if (operation == '-')
+	{
 		value_of_formula = number1 - number2;
+		return;
+	}
 	if (operation == '*')
+	{
 		value_of_formula = number1 * number2;
+		return;
+	}
 	if (operation == '/')
 	{
-		if(number2!=0)
-		value_of_formula = number1 / number2;
+		if (number2 != 0)
+		{
+			value_of_formula = number1 / number2;
+			return;
+		}
+		else is_correct = false;
 	}
 	if (operation == '^')
 		value_of_formula = pow(number1 , number2);

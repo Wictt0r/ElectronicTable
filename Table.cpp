@@ -85,8 +85,8 @@ void Table::del()
 	{
 		for (size_t j = 0; j < width[i]; ++j)
 		{
-			if(matrix[i][j]!=nullptr)
-			matrix[i][j]->~Cell();
+			
+			delete matrix[i][j];
 		}
 	}
 	for (size_t i = 0; i < height; ++i)
@@ -375,6 +375,10 @@ void Table::copy(const Table& other)
 	}
 	for (size_t i = 0; i < height; ++i)
 		width[i] = other.width[i];
+	for (size_t i = 0; i < height; ++i)
+		for (size_t j = 0; j < width[i]; ++j)
+			if(other.matrix[i][j]!=nullptr)
+			matrix[i][j] = other.matrix[i][j]->copy();
 }
 
 void Table::save()

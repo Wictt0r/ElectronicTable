@@ -5,48 +5,26 @@
 #include"Cell_Formula.h"
 #pragma warning(disable:4996)
 
-//std::ostream& operator<<(std::ostream& out , Cell* cell)
-//{
-//	// TODO: insert return statement here
-//	//out << cell->content;
-//	return out;
-//}
-
-//std::istream& operator>>(std::istream& in, Cell* cell)
-//{
-//	in >> cell->get_content();
-//	return in;
-//}
-
-Cell::Cell(const Cell& other)
-{
-	copy(other);
-}
-
 Cell::~Cell()
 {
 	del();
+	std::cout << "I destroy\n";
 }
 
-
-Cell* Cell::operator=(const Cell& other)
-{
-	if(this!=&other)
-	{ 
-	del();
-	copy(other);
-	}
-	return this;
-}
-void Cell::copy(const Cell& other)
-{
-	strcpy(type, other.type);
-	initial_text = new(std::nothrow)char[strlen(other.initial_text) + 1];
-	strcpy(initial_text, other.initial_text);
-}
 void Cell::del()
 {
 	delete[] initial_text;
+}
+void Cell::set_type(const char* _type)
+{
+	strcpy(type, _type);
+}
+void Cell::set_initial_text(const char* _initial_text)
+{
+	initial_text = new(std::nothrow) char[strlen(_initial_text) + 1];
+	if (initial_text == nullptr)
+		return;
+	strcpy(initial_text, _initial_text);
 }
 float Cell::str_to_float(char* number)
 {
