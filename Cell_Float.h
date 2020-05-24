@@ -13,6 +13,5 @@ public:
 	Cell* copy();
 	
 private:
-	void calculate(Cell***, size_t, size_t*, size_t, size_t);
 };
 

@@ -49,11 +49,6 @@ Cell* Cell_String::copy()
 	return new (std::nothrow) Cell_String(*this);
 }
 
-void Cell_String::calculate(Cell***, size_t, size_t*,size_t,size_t)
-{
-	return;
-}
-
 char* Cell_String::remove_quotes()
 {
 	size_t word_lenght = strlen(initial_text) - 1;

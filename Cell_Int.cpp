@@ -33,7 +33,3 @@ Cell* Cell_Int::copy()
 	return new (std::nothrow) Cell_Int(*this);
 }
 
-void Cell_Int::calculate(Cell***, size_t, size_t*,size_t,size_t)
-{
-	return;
-}

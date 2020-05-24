@@ -14,6 +14,10 @@ void Cell::del()
 {
 	delete[] initial_text;
 }
+void Cell::calculate(Cell***, size_t, size_t*, size_t, size_t)
+{
+	return;
+}
 void Cell::set_type(const char* _type)
 {
 	strcpy(type, _type);

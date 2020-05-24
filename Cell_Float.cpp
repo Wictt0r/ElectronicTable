@@ -34,8 +34,4 @@ Cell* Cell_Float::copy()
 	return new(std::nothrow) Cell_Float(*this);
 }
 
-void Cell_Float::calculate(Cell***, size_t, size_t*,size_t,size_t)
-{
-	return;
-}
 

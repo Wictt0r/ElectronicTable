@@ -12,6 +12,5 @@ public:
 	Cell* copy();
 private:
 	char* remove_quotes();
-	void calculate(Cell***, size_t, size_t*, size_t, size_t);
 
 };

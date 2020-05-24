@@ -15,7 +15,7 @@ public:
 	void del();
 	virtual float value() = 0;
 	virtual char* print() = 0;
-	virtual void calculate(Cell***,size_t,size_t*,size_t,size_t) = 0;
+	virtual void calculate(Cell***,size_t,size_t*,size_t,size_t);
 	void set_type(const char*);
 	void set_initial_text(const char*);
 	static float str_to_float(char*);
