@@ -538,13 +538,16 @@ bool Table::edit(char** split_input,size_t lenght)
 		resize_line(edit_height, edit_width);
 	}
 	edit_initialize_new_word(split_input, lenght, new_cell);
-	if(matrix[edit_height][edit_width]!=nullptr)
-	delete matrix[edit_height][edit_width];
+	Cell* temp= matrix[edit_height][edit_width];
 	matrix[edit_height][edit_width] = Cell_Factory::Initialize(new_cell);
 	if (matrix[edit_height][edit_width] == nullptr)
 	{
-		std::cout << "Previous Cell data lost\n";
+		matrix[edit_height][edit_width] = temp;
 		return false;
+	}
+	else
+	{
+		delete temp;
 	}
 	return true;
 }
