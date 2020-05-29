@@ -20,7 +20,7 @@ Cell_Int::Cell_Int():Cell()
 
 float Cell_Int::value()
 {
-	return atoi(initial_text);
+	return str_to_float(initial_text);
 }
 
 char* Cell_Int::print()

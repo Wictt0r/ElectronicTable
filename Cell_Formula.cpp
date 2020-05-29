@@ -81,7 +81,7 @@ void Cell_Formula::calculate(Cell*** matrix,size_t height,size_t* width,size_t c
 float Cell_Formula::calculate_first_number(Cell*** matrix, size_t height, size_t* width,size_t &next_symbol, size_t current_height, size_t current_width)
 {
 	float number = 0;
-	size_t edit_height = 0, edit_width = 0, i = 1,symbol_counter = 0;;
+	size_t edit_height = 0, edit_width = 0, i = 1,symbol_counter = 0,dot_counter=0;
 	bool is_formula = false;
 	char word[32];
 	while (initial_text[i] != '+' && initial_text[i] != '-' && initial_text[i] != '*' && initial_text[i] != '/' && initial_text[i] != '^')
@@ -91,21 +91,34 @@ float Cell_Formula::calculate_first_number(Cell*** matrix, size_t height, size_t
 			++i;
 			continue;
 		}
-		if (initial_text[i] < '0' || initial_text[i]>'9')
+		if (initial_text[i] == '.')
+			++dot_counter;
+		if ((initial_text[i] < '0' || initial_text[i]>'9')&& initial_text[i]!='.')
 			is_formula = true;
 		word[symbol_counter] = initial_text[i];
 		++symbol_counter;
 		++i;
 	}
 	word[symbol_counter] = '\0';
+	if (dot_counter > 1)
+	{
+		next_symbol = i;
+		return 0;
+	}
 	if (is_formula == true)
 	{
 		if (detect_cell(word, edit_height, edit_width) == true )
 		{ 
-			if (edit_height > height || edit_width > width[edit_height] ||(current_height==edit_height && current_width==edit_width))
+			if (edit_height > height || edit_width > width[edit_height] || (current_height == edit_height && current_width == edit_width))
+			{
+				next_symbol = i;
 				return 0;
+			}
 			if (matrix[edit_height][edit_width] == nullptr)
+			{
+				next_symbol = i;
 				return 0;
+			}
 				number = matrix[edit_height][edit_width]->value();
 		}
 	}
@@ -118,7 +131,7 @@ float Cell_Formula::calculate_first_number(Cell*** matrix, size_t height, size_t
 float Cell_Formula::calculate_second_number(Cell*** matrix, size_t height, size_t* width, size_t& next_symbol, size_t current_height, size_t current_width)
 {
 	float number = 0;
-	size_t  edit_height = 0, edit_width = 0 ,i = next_symbol + 1,symbol_counter=0;
+	size_t  edit_height = 0, edit_width = 0 ,i = next_symbol + 1,symbol_counter=0,dot_counter=0;
 	bool is_formula = false;
 	char word[32];
 	while (initial_text[i] != '\0')
@@ -128,13 +141,17 @@ float Cell_Formula::calculate_second_number(Cell*** matrix, size_t height, size_
 			++i;
 			continue;
 		}
-		if (initial_text[i] < '0' || initial_text[i]>'9')
+		if (initial_text[i] == '.')
+			++dot_counter;
+		if ((initial_text[i] < '0' || initial_text[i]>'9') && initial_text[i] != '.')
 			is_formula = true;
 		word[symbol_counter] = initial_text[i];
 		++symbol_counter;
 		++i;
 	}
 	word[symbol_counter] = '\0';
+	if (dot_counter > 1)
+		return 0;
 	if (is_formula == true)
 	{
 		if (detect_cell(word, edit_height, edit_width) == true)

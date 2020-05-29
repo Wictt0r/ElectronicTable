@@ -19,8 +19,11 @@ Cell_String::Cell_String():Cell()
 float Cell_String::value()
 {
 	float number;
-	size_t dot_counter = 0;
-	for (size_t i = 1; i < strlen(initial_text)-1; ++i)
+	size_t dot_counter = 0,i=1;
+	if (initial_text[i] == '+' || initial_text[i] == '-')
+		++i;
+	
+	for (i; i < strlen(initial_text)-1; ++i)
 	{
 		if ((initial_text[i] < '0' || initial_text[i]>'9') && initial_text[i] != '.')
 			return 0;
@@ -29,13 +32,9 @@ float Cell_String::value()
 	}
 	if (dot_counter > 1)
 		return 0;
-	if (dot_counter == 1)
+	if (dot_counter == 1 || dot_counter==0)
 	{
 		return Cell::str_to_float(remove_quotes());
-	}
-	if (dot_counter == 0)
-	{
-		return atoi(remove_quotes());
 	}
 }
 

@@ -556,12 +556,12 @@ void Table::help()
 {
 	std::cout << "The following commands are supported:\n";
 	std::cout << "open <file>: opens <file>\n";
-	std::cout << "close: closes currently opened file\n";
+	std::cout << "close: closes currently opened table\n";
 	std::cout << "save: saves the current file\n";
 	std::cout << "save as <name>: saves current file as <name>\n";
 	std::cout << "help: prints this information\n";
 	std::cout << "print: prints the current table\n";
-	std::cout << "edit <Cell(R<line>C<column>)> <new text>: changes the given cell to <new text>\n";
+	std::cout << "edit <(R<line>C<column>)> <new text>: changes the given cell to <new text>\n";
 }
 
 

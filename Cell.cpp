@@ -99,5 +99,6 @@ char* Cell::float_to_str(float number)
 {
 	static char word[32];
 	_gcvt(number, 30, word);
+	if (word[strlen(word)-1] == '.')word[strlen(word)-1] = '\0';
 	return word;
 }
