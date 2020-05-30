@@ -1,4 +1,5 @@
 #include "Cell_Formula.h"
+#include<cmath>
 
 Cell_Formula::Cell_Formula(char* input)
 {
@@ -26,7 +27,9 @@ float Cell_Formula::value()
 char* Cell_Formula::print()
 {
 	if (is_correct == true)
+	{
 		return float_to_str(value_of_formula);
+	}
 	else 
 	{
 		static char error[] = "Error";
@@ -74,7 +77,9 @@ void Cell_Formula::calculate(Cell*** matrix,size_t height,size_t* width,size_t c
 		else is_correct = false;
 	}
 	if (operation == '^')
-		value_of_formula = pow(number1 , number2);
+	{
+		value_of_formula = pow(number1, number2);
+	}
 	return;
 }
 

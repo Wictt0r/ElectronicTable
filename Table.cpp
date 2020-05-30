@@ -44,10 +44,19 @@ void Table::split_input(char*input, size_t lenght)
 	}
 	size_t split_input_counter = 0;
 	char* token = strtok(input, " ");
+	if (token == nullptr)
+	{
+		std::cout << "Invaild input\n";
+		return;
+	}
 	split_input[split_input_counter] = new(std::nothrow) char[strlen(token) + 1];
 	if (split_input[split_input_counter] == nullptr)
 	{
 		std::cout << "Error\n";
+		for (size_t i = 0; i < split_input_counter; ++i)
+			delete[] split_input[i];
+		delete[] split_input;
+		return;
 	}
 	strcpy(split_input[split_input_counter], token);
 	++split_input_counter;
@@ -108,7 +117,7 @@ void Table::calculate_formulas()
 
 void Table::detect_function(char** split_input, size_t lenght)
 {
-	if (strcmp(split_input[0],"open")==0)
+	if (lenght==2 && strcmp(split_input[0],"open")==0)
 	{
 		if (is_default() == false)
 		{
@@ -126,7 +135,7 @@ void Table::detect_function(char** split_input, size_t lenght)
 			return;
 		}
 	}
-	if (strcmp(split_input[0], "close") == 0)
+	if (lenght==1 && strcmp(split_input[0], "close") == 0)
 	{
 		if (is_default() == false)
 		{
@@ -138,12 +147,17 @@ void Table::detect_function(char** split_input, size_t lenght)
 		
 		return;
 	}
-	if (strcmp(split_input[0], "print") == 0)
+	if (lenght==1 && strcmp(split_input[0], "print") == 0)
 	{
+		if (is_default() == true)
+		{
+			std::cout << "No active table\n";
+			return;
+		}
 		print();
 		return;
 	}
-	if (strcmp(split_input[0], "edit") == 0)
+	if (lenght>2 && strcmp(split_input[0], "edit") == 0)
 	{
 		if (is_default() == true)
 		{
@@ -160,17 +174,27 @@ void Table::detect_function(char** split_input, size_t lenght)
 	}
 	if (lenght==3 && strcmp(split_input[0], "save") == 0 && strcmp(split_input[1],"as")==0)
 	{
+		if (is_default() == true)
+		{
+			std::cout << "No active table\n";
+			return;
+		}
 		save_as(split_input[2]);
 		std::cout << "Table saved as:" << split_input[2] << std::endl;
 		return;
 	}
-	if (strcmp(split_input[0], "save") == 0 && lenght==1)
+	if (lenght==1 && strcmp(split_input[0], "save") == 0)
 	{
+		if (is_default() == true)
+		{
+			std::cout << "No active table\n";
+			return;
+		}
 		save();
 		std::cout << "Table saved\n";
 		return;
 	}
-	if (strcmp(split_input[0], "help") == 0)
+	if (lenght==1 && strcmp(split_input[0], "help") == 0)
 	{
 		help();
 		return;
